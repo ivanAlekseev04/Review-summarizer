@@ -14,11 +14,30 @@ export const reviewController = {
         const parsed = pathParamsSchema.safeParse(req.params);
 
         if (!parsed.success) {
-            res.status(400).json({error: 'Invalid product ID.'});
+            res.status(400).json({ error: 'Invalid product ID.' });
             return;
         }
-        
-        const reviews = await reviewService.getReviewsByProductIdOrderByCreatedAtDesc(parsed.data.id);
+
+        const reviews =
+            await reviewService.getReviewsByProductIdOrderByCreatedAtDesc(
+                parsed.data.id
+            );
+
         res.json(reviews);
+    },
+
+    async getReviewsSummaryByProductId(req: Request, res: Response) {
+        const parsed = pathParamsSchema.safeParse(req.params);
+
+        if (!parsed.success) {
+            res.status(400).json({ error: 'Invalid product ID.' });
+            return;
+        }
+
+        const summary = await reviewService.generateReviewsSummaryByProductId(
+            parsed.data.id
+        );
+        
+        res.json({ summary });
     },
 };

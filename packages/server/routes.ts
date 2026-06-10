@@ -10,4 +10,6 @@ router.get('/', (req: Request, res: Response) => {
 
 router.get('/api/products/:id/reviews', reviewController.getReviewsByProductIdOrderByCreatedAtDesc);
 
+router.get('/api/products/:id/reviews/summary', reviewController.getReviewsSummaryByProductId);
+
 export default router;
