@@ -1,5 +1,4 @@
 import OpenAI from 'openai';
-import type { ChatResponse } from '../model/ChatResponse';
 
 // To be more flexible regarding LLP provider (Anthropic, OpenAI, Google)
 type GenerateTextOption = {
@@ -8,6 +7,11 @@ type GenerateTextOption = {
     temperature?: number;
     maxTokens?: number;
 };
+
+type LLMResponse = {
+    id: string, 
+    content: string
+}
 
 const client = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -19,7 +23,7 @@ export const aiService = {
         prompt,
         temperature = 0.2,
         maxTokens = 500,
-    }: GenerateTextOption): Promise<ChatResponse> {
+    }: GenerateTextOption): Promise<LLMResponse> {
         const response = await client.responses.create({
             model,
             input: prompt,
