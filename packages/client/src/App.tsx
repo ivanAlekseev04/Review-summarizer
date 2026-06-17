@@ -1,9 +1,9 @@
-import ReviesList from './components/reviews/ReviesList';
+import ReviewsList from './components/reviews/ReviewsList';
 
 function App() {
     return (
         <div className="p-4 h-screen w-full">
-            <ReviesList productId={1} />
+            <ReviewsList productId={1} />
         </div>
     );
 }
