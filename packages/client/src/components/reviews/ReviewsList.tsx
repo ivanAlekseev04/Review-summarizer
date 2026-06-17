@@ -27,21 +27,12 @@ type SummarizeResponse = {
 };
 
 const ReviewsList = ({ productId }: Props) => {
-    const {
-        mutate: handleSummarize,
-        isPending: isSummaryLoading,
-        isError: isSummaryError,
-        data: summarizeResponse,
-    } = useMutation<SummarizeResponse>({
+    const summaryMutation = useMutation<SummarizeResponse>({
         mutationFn: () => summarizeReviews(),
     });
 
     // Tanstack is replacing 'useEffect' hooks, adding retry mechanism when calling API's
-    const {
-        data: reviewData,
-        isLoading,
-        error,
-    } = useQuery<ReviewsResponse>({
+    const reviewsQuery = useQuery<ReviewsResponse>({
         queryKey: ['reviews', productId], // used for caching data
         queryFn: () => fetchReviews(),
     });
@@ -62,7 +53,7 @@ const ReviewsList = ({ productId }: Props) => {
         return data;
     };
 
-    if (isLoading) {
+    if (reviewsQuery.isLoading) {
         return (
             <div className="flex flex-col gap-5">
                 {[1, 2, 3].map((placeholder) => (
@@ -72,7 +63,7 @@ const ReviewsList = ({ productId }: Props) => {
         );
     }
 
-    if (error) {
+    if (reviewsQuery.error) {
         return (
             <p className="text-red-500">
                 Cannot render the reviews currently. Please, try again later!
@@ -80,11 +71,11 @@ const ReviewsList = ({ productId }: Props) => {
         );
     }
 
-    if (!reviewData?.reviews.length) {
+    if (!reviewsQuery.data?.reviews.length) {
         return null;
     }
 
-    const currentSummary = reviewData.summary || summarizeResponse?.summary;
+    const currentSummary = reviewsQuery.data.summary || summaryMutation.data?.summary;
 
     return (
         <div>
@@ -94,26 +85,26 @@ const ReviewsList = ({ productId }: Props) => {
                 ) : (
                     <div>
                         <Button
-                            onClick={() => handleSummarize()}
+                            onClick={() => summaryMutation.mutate()}
                             className="cursor-pointer"
-                            disabled={isSummaryLoading}
+                            disabled={summaryMutation.isPending}
                         >
                             <HiSparkles />
                             Summarize
                         </Button>
-                        {isSummaryLoading && (
+                        {summaryMutation.isPending && (
                             <div className="py-3">
                                 <ReviewSkeleton />
                             </div>
                         )}
-                        {isSummaryError && (
+                        {summaryMutation.error && (
                             <p className="text-red-500">Could not summarize reviews. Try again!</p>
                         )}
                     </div>
                 )}
             </div>
             <div className="flex flex-col gap-5">
-                {reviewData?.reviews.map((review) => (
+                {reviewsQuery.data?.reviews.map((review) => (
                     <div key={review.id}>
                         <div className="font-semibold">{review.author}</div>
                         <div>
