@@ -16,13 +16,20 @@ const ProductsPage = ({ onSelectProduct }: Props) => {
 
     return (
         <div>
-            <div className="mb-5 flex items-center justify-between">
-                <h1 className="text-2xl font-semibold">Products</h1>
+            <div className="mb-7 flex items-center justify-between">
+                <div>
+                    <h1 className="font-heading text-2xl font-semibold tracking-tight">
+                        Products
+                    </h1>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        Pick a product to read its reviews and AI summary.
+                    </p>
+                </div>
                 <AddProductDialog existingProducts={productsQuery.data ?? []} />
             </div>
             {productsQuery.isLoading && <ProductsSkeleton />}
             {productsQuery.error && (
-                <p className="text-red-500">
+                <p className="rounded-2xl border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
                     Cannot render the products currently. Please, try again
                     later!
                 </p>

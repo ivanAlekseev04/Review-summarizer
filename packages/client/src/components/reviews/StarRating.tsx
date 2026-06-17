@@ -12,7 +12,11 @@ export const StarRating = ({ value }: Props) => {
             {placeholders.map((p) => (
                 <FaStar
                     key={p}
-                    className={p <= value ? 'text-yellow-400' : 'text-gray-300'}
+                    className={
+                        p <= value
+                            ? 'text-accent-yellow drop-shadow-[0_0_6px_rgba(255,210,63,0.45)]'
+                            : 'text-white/10'
+                    }
                 />
             ))}
         </div>

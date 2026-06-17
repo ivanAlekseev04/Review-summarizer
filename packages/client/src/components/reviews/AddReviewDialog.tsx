@@ -24,7 +24,7 @@ type FormErrors = {
 };
 
 const inputClassName =
-    'w-full rounded-md border border-border bg-input/30 px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50';
+    'w-full rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground/60 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50';
 
 const AddReviewDialog = ({
     productId,
@@ -135,7 +135,7 @@ const AddReviewDialog = ({
                             className={inputClassName}
                         />
                         {errors.author && (
-                            <p className="mt-1 text-sm text-red-500">
+                            <p className="mt-1 text-sm text-destructive">
                                 {errors.author}
                             </p>
                         )}
@@ -158,7 +158,7 @@ const AddReviewDialog = ({
                             className={inputClassName}
                         />
                         {errors.rating && (
-                            <p className="mt-1 text-sm text-red-500">
+                            <p className="mt-1 text-sm text-destructive">
                                 {errors.rating}
                             </p>
                         )}
@@ -177,13 +177,13 @@ const AddReviewDialog = ({
                             className={`${inputClassName} h-20 min-h-20 max-h-[120px] resize-y`}
                         />
                         {errors.content && (
-                            <p className="mt-1 text-sm text-red-500">
+                            <p className="mt-1 text-sm text-destructive">
                                 {errors.content}
                             </p>
                         )}
                     </div>
                     {createReviewMutation.error && (
-                        <p className="text-sm text-red-500">
+                        <p className="text-sm text-destructive">
                             Could not save the review. Try again!
                         </p>
                     )}

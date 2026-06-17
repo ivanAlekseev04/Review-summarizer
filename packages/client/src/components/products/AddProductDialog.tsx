@@ -22,7 +22,7 @@ type FormErrors = {
 };
 
 const inputClassName =
-    'w-full rounded-md border border-border bg-input/30 px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50';
+    'w-full rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground/60 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50';
 
 const AddProductDialog = ({ existingProducts }: Props) => {
     const [open, setOpen] = useState(false);
@@ -124,7 +124,7 @@ const AddProductDialog = ({ existingProducts }: Props) => {
                             className={inputClassName}
                         />
                         {errors.name && (
-                            <p className="mt-1 text-sm text-red-500">
+                            <p className="mt-1 text-sm text-destructive">
                                 {errors.name}
                             </p>
                         )}
@@ -143,7 +143,7 @@ const AddProductDialog = ({ existingProducts }: Props) => {
                             className={`${inputClassName} h-20 min-h-20 max-h-[120px] resize-y`}
                         />
                         {errors.description && (
-                            <p className="mt-1 text-sm text-red-500">
+                            <p className="mt-1 text-sm text-destructive">
                                 {errors.description}
                             </p>
                         )}
@@ -165,13 +165,13 @@ const AddProductDialog = ({ existingProducts }: Props) => {
                             className={inputClassName}
                         />
                         {errors.price && (
-                            <p className="mt-1 text-sm text-red-500">
+                            <p className="mt-1 text-sm text-destructive">
                                 {errors.price}
                             </p>
                         )}
                     </div>
                     {createProductMutation.error && (
-                        <p className="text-sm text-red-500">
+                        <p className="text-sm text-destructive">
                             Could not save the product. Try again!
                         </p>
                     )}
