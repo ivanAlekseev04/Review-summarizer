@@ -101,7 +101,7 @@ const ReviewsList = ({ productId }: Props) => {
                             </Button>
                         )}
                         {summaryMutation.isPending && (
-                            <div className="rounded-3xl border border-white/10 bg-card/70 p-5 py-3">
+                            <div className="rounded-3xl border border-white/10 bg-card/70 p-5 py-3 mt-4">
                                 <ReviewSkeleton />
                             </div>
                         )}
