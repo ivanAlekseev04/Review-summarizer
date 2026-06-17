@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { StarRating } from './StarRating';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '../../../components/ui/button';
-import { HiSparkles } from 'react-icons/hi2';
+import { HiChevronLeft, HiChevronRight, HiSparkles } from 'react-icons/hi2';
 import ReviewSkeleton from './ReviewSkeleton';
 import AddReviewDialog from './AddReviewDialog';
+import ReviewContentDialog from './ReviewContentDialog';
 import {
     reviewsApi,
     type ReviewsResponse,
@@ -13,6 +15,9 @@ import {
 type Props = {
     productId: number;
 };
+
+const REVIEWS_PER_PAGE = 5;
+const CONTENT_PREVIEW_LENGTH = 240;
 
 const AVATAR_PALETTE = [
     'bg-accent-purple/15 text-accent-purple',
@@ -33,6 +38,15 @@ const getInitials = (name: string) =>
 
 const ReviewsList = ({ productId }: Props) => {
     const queryClient = useQueryClient();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pagedProductId, setPagedProductId] = useState(productId);
+
+    // Switching products should always land back on page 1. Adjusting state
+    // during render (rather than an effect) avoids an extra commit.
+    if (productId !== pagedProductId) {
+        setPagedProductId(productId);
+        setCurrentPage(1);
+    }
 
     const summaryMutation = useMutation<SummarizeResponse>({
         mutationFn: () => reviewsApi.summarizeReviews(productId),
@@ -41,6 +55,7 @@ const ReviewsList = ({ productId }: Props) => {
     const handleReviewAdded = () => {
         queryClient.invalidateQueries({ queryKey: ['reviews', productId] });
         summaryMutation.mutate();
+        setCurrentPage(1);
     };
 
     // Tanstack is replacing 'useEffect' hooks, adding retry mechanism when calling API's
@@ -73,6 +88,17 @@ const ReviewsList = ({ productId }: Props) => {
 
     const currentSummary =
         reviewsQuery.data.summary || summaryMutation.data?.summary;
+
+    const reviews = reviewsQuery.data.reviews;
+    const totalPages = Math.max(
+        1,
+        Math.ceil(reviews.length / REVIEWS_PER_PAGE)
+    );
+    const pageStart = (currentPage - 1) * REVIEWS_PER_PAGE;
+    const paginatedReviews = reviews.slice(
+        pageStart,
+        pageStart + REVIEWS_PER_PAGE
+    );
 
     return (
         <div>
@@ -121,30 +147,93 @@ const ReviewsList = ({ productId }: Props) => {
                 />
             </div>
             <div className="flex flex-col gap-4">
-                {reviewsQuery.data?.reviews.map((review, index) => (
-                    <div
-                        key={review.id}
-                        className="rounded-2xl border border-white/[0.07] bg-card/40 p-5"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span
-                                className={`grid size-9 shrink-0 place-items-center rounded-full font-heading text-xs font-semibold ${getAvatarStyle(index)}`}
-                            >
-                                {getInitials(review.author)}
-                            </span>
-                            <div>
-                                <div className="font-semibold text-foreground">
-                                    {review.author}
+                {paginatedReviews.map((review, index) => {
+                    const isContentTruncated =
+                        review.content.length > CONTENT_PREVIEW_LENGTH;
+                    const contentPreview = isContentTruncated
+                        ? `${review.content.slice(0, CONTENT_PREVIEW_LENGTH)}…`
+                        : review.content;
+
+                    return (
+                        <div
+                            key={review.id}
+                            className="rounded-2xl border border-white/[0.07] bg-card/40 p-5"
+                        >
+                            <div className="flex items-center gap-3">
+                                <span
+                                    className={`grid size-9 shrink-0 place-items-center rounded-full font-heading text-xs font-semibold ${getAvatarStyle(pageStart + index)}`}
+                                >
+                                    {getInitials(review.author)}
+                                </span>
+                                <div>
+                                    <div className="font-semibold text-foreground">
+                                        {review.author}
+                                    </div>
+                                    <StarRating value={review.rating} />
                                 </div>
-                                <StarRating value={review.rating} />
+                            </div>
+                            <div className="mt-3 flex items-start gap-1 text-sm leading-relaxed text-muted-foreground">
+                                <span className="min-w-0 flex-1 break-words">
+                                    {contentPreview}
+                                </span>
+                                {isContentTruncated && (
+                                    <ReviewContentDialog
+                                        author={review.author}
+                                        content={review.content}
+                                    />
+                                )}
                             </div>
                         </div>
-                        <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                            {review.content}
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
+            {totalPages > 1 && (
+                <div className="mt-6 flex items-center justify-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        disabled={currentPage === 1}
+                        onClick={() =>
+                            setCurrentPage((page) => Math.max(1, page - 1))
+                        }
+                        aria-label="Previous page"
+                    >
+                        <HiChevronLeft />
+                    </Button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (page) => (
+                            <Button
+                                key={page}
+                                variant={
+                                    page === currentPage
+                                        ? 'default'
+                                        : 'outline'
+                                }
+                                size="icon-sm"
+                                className="cursor-pointer"
+                                onClick={() => setCurrentPage(page)}
+                            >
+                                {page}
+                            </Button>
+                        )
+                    )}
+                    <Button
+                        variant="outline"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        disabled={currentPage === totalPages}
+                        onClick={() =>
+                            setCurrentPage((page) =>
+                                Math.min(totalPages, page + 1)
+                            )
+                        }
+                        aria-label="Next page"
+                    >
+                        <HiChevronRight />
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

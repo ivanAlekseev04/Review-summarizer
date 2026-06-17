@@ -23,6 +23,8 @@ type FormErrors = {
     content?: string;
 };
 
+const MAX_CONTENT_LENGTH = 500;
+
 const inputClassName =
     'w-full rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground/60 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50';
 
@@ -93,6 +95,8 @@ const AddReviewDialog = ({
 
         if (!trimmedContent) {
             newErrors.content = 'Description cannot be empty.';
+        } else if (trimmedContent.length > MAX_CONTENT_LENGTH) {
+            newErrors.content = `Description cannot exceed ${MAX_CONTENT_LENGTH} characters.`;
         }
 
         setErrors(newErrors);
