@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { productsApi, type Product } from './productsApi';
 import ProductsTable from './ProductsTable';
 import ProductsSkeleton from './ProductsSkeleton';
+import AddProductDialog from './AddProductDialog';
 
 type Props = {
     onSelectProduct: (productId: number) => void;
@@ -15,7 +16,10 @@ const ProductsPage = ({ onSelectProduct }: Props) => {
 
     return (
         <div>
-            <h1 className="mb-5 text-2xl font-semibold">Products</h1>
+            <div className="mb-5 flex items-center justify-between">
+                <h1 className="text-2xl font-semibold">Products</h1>
+                <AddProductDialog existingProducts={productsQuery.data ?? []} />
+            </div>
             {productsQuery.isLoading && <ProductsSkeleton />}
             {productsQuery.error && (
                 <p className="text-red-500">

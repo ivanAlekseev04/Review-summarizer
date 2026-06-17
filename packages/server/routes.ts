@@ -11,10 +11,14 @@ router.get('/', (req: Request, res: Response) => {
 
 router.get('/api/products', productController.getAllProducts);
 
+router.post('/api/products', productController.createProduct);
+
 router.get(
     '/api/products/:id/reviews',
     reviewController.getReviewsByProductIdOrderByCreatedAtDesc
 );
+
+router.post('/api/products/:id/reviews', reviewController.createReview);
 
 router.get(
     '/api/products/:id/reviews/summary',

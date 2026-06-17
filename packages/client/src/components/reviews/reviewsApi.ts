@@ -17,6 +17,12 @@ export type SummarizeResponse = {
     summary: string;
 };
 
+export type CreateReviewInput = {
+    author: string;
+    rating: number;
+    content: string;
+};
+
 export const reviewsApi = {
     fetchReviews(productId: number) {
         return axios
@@ -29,6 +35,12 @@ export const reviewsApi = {
             .get<SummarizeResponse>(
                 `/api/products/${productId}/reviews/summary`
             )
+            .then((res) => res.data);
+    },
+
+    createReview(productId: number, input: CreateReviewInput) {
+        return axios
+            .post<Review>(`/api/products/${productId}/reviews`, input)
             .then((res) => res.data);
     },
 };

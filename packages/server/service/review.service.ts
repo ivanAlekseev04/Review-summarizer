@@ -30,11 +30,11 @@ export const reviewService = {
                 limit
             );
 
-        if (productReviews === null || productReviews.length === 0) {
-            throw new NotFoundError(
-                `No reviews were found for the product with id ${productId}.`
-            );
-        }
+        // if (productReviews === null || productReviews.length === 0) {
+        //     throw new NotFoundError(
+        //         `No reviews were found for the product with id ${productId}.`
+        //     );
+        // }
 
         const existingSummary = await getReviewsSummaryByProductId(productId);
 
@@ -66,5 +66,21 @@ export const reviewService = {
         );
 
         return summary.content;
+    },
+
+    async createReview(
+        productId: number,
+        input: { author: string; rating: number; content: string }
+    ): Promise<Review> {
+        const review = await reviewRepository.create({
+            productId,
+            ...input,
+        });
+
+        // The cached summary no longer reflects this new review, so drop it
+        // and let the next summary request regenerate it from scratch.
+        await summaryRepository.deleteByProductId(productId);
+
+        return review;
     },
 };

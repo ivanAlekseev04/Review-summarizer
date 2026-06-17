@@ -1,8 +1,9 @@
 import { StarRating } from './StarRating';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '../../../components/ui/button';
 import { HiSparkles } from 'react-icons/hi2';
 import ReviewSkeleton from './ReviewSkeleton';
+import AddReviewDialog from './AddReviewDialog';
 import {
     reviewsApi,
     type ReviewsResponse,
@@ -14,9 +15,16 @@ type Props = {
 };
 
 const ReviewsList = ({ productId }: Props) => {
+    const queryClient = useQueryClient();
+
     const summaryMutation = useMutation<SummarizeResponse>({
         mutationFn: () => reviewsApi.summarizeReviews(productId),
     });
+
+    const handleReviewAdded = () => {
+        queryClient.invalidateQueries({ queryKey: ['reviews', productId] });
+        summaryMutation.mutate();
+    };
 
     // Tanstack is replacing 'useEffect' hooks, adding retry mechanism when calling API's
     const reviewsQuery = useQuery<ReviewsResponse>({
@@ -42,7 +50,7 @@ const ReviewsList = ({ productId }: Props) => {
         );
     }
 
-    if (!reviewsQuery.data?.reviews.length) {
+    if (!reviewsQuery.data) {
         return null;
     }
 
@@ -56,14 +64,16 @@ const ReviewsList = ({ productId }: Props) => {
                     <p>{currentSummary}</p>
                 ) : (
                     <div>
-                        <Button
-                            onClick={() => summaryMutation.mutate()}
-                            className="cursor-pointer"
-                            disabled={summaryMutation.isPending}
-                        >
-                            <HiSparkles />
-                            Summarize
-                        </Button>
+                        {Boolean(reviewsQuery.data?.reviews.length) && (
+                            <Button
+                                onClick={() => summaryMutation.mutate()}
+                                className="cursor-pointer"
+                                disabled={summaryMutation.isPending}
+                            >
+                                <HiSparkles />
+                                Summarize
+                            </Button>
+                        )}
                         {summaryMutation.isPending && (
                             <div className="py-3">
                                 <ReviewSkeleton />
@@ -76,6 +86,13 @@ const ReviewsList = ({ productId }: Props) => {
                         )}
                     </div>
                 )}
+            </div>
+            <div className="mb-5">
+                <AddReviewDialog
+                    productId={productId}
+                    existingReviews={reviewsQuery.data?.reviews ?? []}
+                    onReviewAdded={handleReviewAdded}
+                />
             </div>
             <div className="flex flex-col gap-5">
                 {reviewsQuery.data?.reviews.map((review) => (

@@ -14,6 +14,10 @@ export const summaryRepository = {
         return summary ? summary.content : null;
     },
 
+    async deleteByProductId(productId: number): Promise<void> {
+        await prisma.summary.deleteMany({ where: { productId } });
+    },
+
     async persistReviewSummary(productId: number, summary: string) {
         const now = new Date();
         const expiresAt = dayjs().add(7, 'days').toDate();

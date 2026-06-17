@@ -7,8 +7,20 @@ export type Product = {
     price: number;
 };
 
+export type CreateProductInput = {
+    name: string;
+    description: string;
+    price: number;
+};
+
 export const productsApi = {
     fetchProducts() {
         return axios.get<Product[]>('/api/products').then((res) => res.data);
+    },
+
+    createProduct(input: CreateProductInput) {
+        return axios
+            .post<Product>('/api/products', input)
+            .then((res) => res.data);
     },
 };
