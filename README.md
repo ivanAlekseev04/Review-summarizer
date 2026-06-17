@@ -5,6 +5,9 @@ AI-generated summary of those reviews, cached in Postgres for 7 days.
 
 Bun workspace monorepo with `packages/client` and `packages/server`.
 
+## ClaudeCode course notes
+- See the `ClaudeCode` important commands/concepts [here](notes/ClaudeCode%20notes.md)
+
 ## Tech Stack
 
 ### Backend (`packages/server`)
