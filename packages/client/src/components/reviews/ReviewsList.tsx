@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { StarRating } from './StarRating';
-import Skeleton from 'react-loading-skeleton';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from "../../../components/ui/button"
-import { HiSparkles } from "react-icons/hi2";
+import { Button } from '../../../components/ui/button';
+import { HiSparkles } from 'react-icons/hi2';
+import { useState } from 'react';
+import ReviewSkeleton from './ReviewSkeleton';
 
 type Props = {
     productId: number;
@@ -22,7 +23,15 @@ type ReviewsResponse = {
     reviews: Review[];
 };
 
+type SummarizeResponse = {
+    summary: string;
+};
+
 const ReviewsList = ({ productId }: Props) => {
+    const [summary, setSummary] = useState('');
+    const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+    const [summaryError, setSummaryError] = useState('');
+
     // Tanstack is replacing 'useEffect' hooks, adding retry mechanism when calling API's
     const {
         data: reviewData,
@@ -32,6 +41,24 @@ const ReviewsList = ({ productId }: Props) => {
         queryKey: ['reviews', productId], // used for caching data
         queryFn: () => fetchReviews(),
     });
+
+    const handleSummarize = async () => {
+        try {
+            setIsSummaryLoading(true);
+            setSummaryError('');
+
+            const { data } = await axios.get<SummarizeResponse>(
+                `/api/products/${productId}/reviews/summary`
+            );
+
+            setSummary(data.summary);
+        } catch (error) {
+            console.error(error);
+            setSummaryError('Could not summarize the reviews. Try again!');
+        } finally {
+            setIsSummaryLoading(false);
+        }
+    };
 
     const fetchReviews = async () => {
         const { data } = await axios.get<ReviewsResponse>(
@@ -45,31 +72,48 @@ const ReviewsList = ({ productId }: Props) => {
         return (
             <div className="flex flex-col gap-5">
                 {[1, 2, 3].map((placeholder) => (
-                    <div key={placeholder}>
-                        <Skeleton width={150} />
-                        <Skeleton width={100} />
-                        <Skeleton count={2} />
-                    </div>
+                    <ReviewSkeleton key={placeholder} />
                 ))}
             </div>
         );
     }
 
     if (error) {
-        return <p className="text-red-500">Cannot render the reviews currently. Please, try again later!</p>;
+        return (
+            <p className="text-red-500">
+                Cannot render the reviews currently. Please, try again later!
+            </p>
+        );
     }
 
     if (!reviewData?.reviews.length) {
         return null;
     }
 
+    const currentSummary = reviewData.summary || summary;
+
     return (
         <div>
-            <div className='mb-5'>
-                {reviewData?.summary ? (
-                    <p>{reviewData?.summary}</p>
+            <div className="mb-5">
+                {currentSummary ? (
+                    <p>{currentSummary}</p>
                 ) : (
-                    <Button><HiSparkles />Summarize</Button>
+                    <div>
+                        <Button
+                            onClick={handleSummarize}
+                            className="cursor-pointer"
+                            disabled={isSummaryLoading}
+                        >
+                            <HiSparkles />
+                            Summarize
+                        </Button>
+                        {isSummaryLoading && (
+                            <div className="py-3">
+                                <ReviewSkeleton />
+                            </div>
+                        )}
+                        {summaryError && <p className='text-red-500'>{summaryError}</p>}
+                    </div>
                 )}
             </div>
             <div className="flex flex-col gap-5">
