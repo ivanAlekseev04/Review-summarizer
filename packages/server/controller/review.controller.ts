@@ -37,7 +37,7 @@ export const reviewController = {
         const summary = await reviewService.generateReviewsSummaryByProductId(
             parsed.data.id
         );
-        
+
         res.json({ summary });
     },
 };

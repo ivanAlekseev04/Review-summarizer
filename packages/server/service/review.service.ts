@@ -15,9 +15,9 @@ const getReviewsSummaryByProductId = async (
 };
 
 type ReviewsResponse = {
-    summary: string | null,
-    reviews: Review[]
-}
+    summary: string | null;
+    reviews: Review[];
+};
 
 export const reviewService = {
     async getReviewsByProductIdOrderByCreatedAtDesc(
@@ -36,8 +36,7 @@ export const reviewService = {
             );
         }
 
-        const existingSummary =
-            await getReviewsSummaryByProductId(productId);
+        const existingSummary = await getReviewsSummaryByProductId(productId);
 
         return { summary: existingSummary, reviews: productReviews };
     },

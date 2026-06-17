@@ -3,7 +3,11 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Button } from '../../../components/ui/button';
 import { HiSparkles } from 'react-icons/hi2';
 import ReviewSkeleton from './ReviewSkeleton';
-import { reviewsApi, type ReviewsResponse, type SummarizeResponse } from './reviewsApi';
+import {
+    reviewsApi,
+    type ReviewsResponse,
+    type SummarizeResponse,
+} from './reviewsApi';
 
 type Props = {
     productId: number;
@@ -42,7 +46,8 @@ const ReviewsList = ({ productId }: Props) => {
         return null;
     }
 
-    const currentSummary = reviewsQuery.data.summary || summaryMutation.data?.summary;
+    const currentSummary =
+        reviewsQuery.data.summary || summaryMutation.data?.summary;
 
     return (
         <div>
@@ -65,7 +70,9 @@ const ReviewsList = ({ productId }: Props) => {
                             </div>
                         )}
                         {summaryMutation.error && (
-                            <p className="text-red-500">Could not summarize reviews. Try again!</p>
+                            <p className="text-red-500">
+                                Could not summarize reviews. Try again!
+                            </p>
                         )}
                     </div>
                 )}

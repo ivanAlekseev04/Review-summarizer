@@ -9,9 +9,9 @@ type GenerateTextOption = {
 };
 
 type LLMResponse = {
-    id: string, 
-    content: string
-}
+    id: string;
+    content: string;
+};
 
 const client = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,

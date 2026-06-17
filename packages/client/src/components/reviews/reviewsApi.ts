@@ -25,8 +25,10 @@ export const reviewsApi = {
     },
 
     summarizeReviews(productId: number) {
-        return axios.get<SummarizeResponse>(
-            `/api/products/${productId}/reviews/summary`
-        ).then(res => res.data);
-    }
+        return axios
+            .get<SummarizeResponse>(
+                `/api/products/${productId}/reviews/summary`
+            )
+            .then((res) => res.data);
+    },
 };

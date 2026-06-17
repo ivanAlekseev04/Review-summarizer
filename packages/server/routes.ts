@@ -8,8 +8,14 @@ router.get('/', (req: Request, res: Response) => {
     res.send('Hello world !!!');
 });
 
-router.get('/api/products/:id/reviews', reviewController.getReviewsByProductIdOrderByCreatedAtDesc);
+router.get(
+    '/api/products/:id/reviews',
+    reviewController.getReviewsByProductIdOrderByCreatedAtDesc
+);
 
-router.get('/api/products/:id/reviews/summary', reviewController.getReviewsSummaryByProductId);
+router.get(
+    '/api/products/:id/reviews/summary',
+    reviewController.getReviewsSummaryByProductId
+);
 
 export default router;
