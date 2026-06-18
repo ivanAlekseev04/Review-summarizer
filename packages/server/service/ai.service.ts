@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import summarizePrompt from '../prompts/summarize-reviews.txt'
 
 // To be more flexible regarding LLP provider (Anthropic, OpenAI, Google)
 type GenerateTextOption = {
@@ -13,7 +14,7 @@ type LLMResponse = {
     content: string;
 };
 
-const client = new OpenAI({
+const openAIClient = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
@@ -22,12 +23,13 @@ export const aiService = {
         model = 'gpt-5.4-mini',
         prompt,
         temperature = 0.2,
-        maxTokens = 500,
+        maxTokens = 500
     }: GenerateTextOption): Promise<LLMResponse> {
-        const response = await client.responses.create({
+        const response = await openAIClient.responses.create({
             model,
             input: prompt,
             temperature,
+            instructions: summarizePrompt,
             max_output_tokens: maxTokens,
         });
 

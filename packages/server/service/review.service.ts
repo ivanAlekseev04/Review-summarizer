@@ -1,9 +1,7 @@
 import { reviewRepository } from '../repository/review.repository';
 import type { Review, Summary } from '../generated/prisma/client';
 import { summaryRepository } from '../repository/summary.repository';
-import { NotFoundError } from '../error/NotFoundError';
 import { aiService } from './ai.service';
-import template from '../prompts/summarize-reviews.txt';
 
 const getReviewsSummaryByProductId = async (
     productId: number
@@ -30,12 +28,6 @@ export const reviewService = {
                 limit
             );
 
-        // if (productReviews === null || productReviews.length === 0) {
-        //     throw new NotFoundError(
-        //         `No reviews were found for the product with id ${productId}.`
-        //     );
-        // }
-
         const existingSummary = await getReviewsSummaryByProductId(productId);
 
         return { summary: existingSummary, reviews: productReviews };
@@ -54,10 +46,9 @@ export const reviewService = {
         const productReviews =
             await this.getReviewsByProductIdOrderByCreatedAtDesc(productId, 10);
 
-        const joinedReviews = productReviews.reviews
+        const prompt = productReviews.reviews
             .map((review) => review.content)
             .join('\n\n');
-        const prompt = template.replace('{{reviews}}', joinedReviews);
 
         const summary = await aiService.getLLMResponse({ prompt });
         await summaryRepository.persistReviewSummary(

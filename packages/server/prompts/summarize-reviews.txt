@@ -1,4 +1,2 @@
 Summarize the following customer reviews into a short, readable paragraph.
 Take into cosideration both positive and negative themes.
-
-{{reviews}}
